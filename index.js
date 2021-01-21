@@ -26,11 +26,14 @@ function init() {
     .then(function (answer) {
       switch (answer.menu) {
         case "[VIEW] Data":
-          connection.query("select * from employee;", function (err, res) {
-            console.table(res);
-          });
+            viewData();
           break;
         case "[ADD] Data":
+          let querystring =
+            "insert into employee (first_name, last_name, role_id, manager_id) values ('Jonathan', 'Watson', 1, 1);";
+          connection.query(querystring, function (err, res) {
+            viewData();
+          });
           break;
         case "[UPDATE] Data":
           break;
@@ -40,4 +43,10 @@ function init() {
           break;
       }
     });
+}
+
+function viewData() {
+    connection.query("select * from employee;", function (err, res) {
+        console.table(res);
+      });
 }
