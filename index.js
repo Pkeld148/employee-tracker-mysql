@@ -26,13 +26,16 @@ function init() {
     .then(function (answer) {
       switch (answer.menu) {
         case "[VIEW] Data":
+          connection.query("select * from employee;", function (err, res) {
+            console.table(res);
+          });
           break;
         case "[ADD] Data":
           break;
         case "[UPDATE] Data":
           break;
         case "EXIT":
-            console.log("Thanks for using the app!");
+          console.log("Thanks for using the app!");
           connection.end();
           break;
       }
