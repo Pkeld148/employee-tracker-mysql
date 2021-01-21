@@ -1,4 +1,5 @@
 const mysql = require("mysql");
+const inquirer = require("inquirer");
 
 const connection = mysql.createConnection({
     host: "localhost",
@@ -11,4 +12,14 @@ const connection = mysql.createConnection({
 connection.connect(function(err) {
     if (err) throw err;
     console.log("Connected as id " + connection.threadId);
+    init();
 });
+
+function init() {
+    inquirer.prompt({
+        name: "menu",
+        type: "list",
+        message: "Welcome to the main menu!",
+        choices: ["Choices", "Will", "Go", "Here"]
+    })
+}
