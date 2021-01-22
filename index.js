@@ -26,16 +26,13 @@ function init() {
     .then(function (answer) {
       switch (answer.menu) {
         case "[VIEW] Data":
-            viewData();
+          viewData();
           break;
         case "[ADD] Data":
-          let querystring =
-            "insert into employee (first_name, last_name, role_id, manager_id) values ('Jonathan', 'Watson', 1, 1);";
-          connection.query(querystring, function (err, res) {
-            viewData();
-          });
+          addData();
           break;
         case "[UPDATE] Data":
+          updateData();
           break;
         case "EXIT":
           console.log("Thanks for using the app!");
@@ -46,7 +43,49 @@ function init() {
 }
 
 function viewData() {
-    connection.query("select * from employee;", function (err, res) {
-        console.table(res);
-      });
+  inquirer
+    .prompt({
+      name: "viewMenu",
+      type: "list",
+      message: "What would you like to view?",
+      choices: ["View All Employees", "View All Roles", "View All Departments"],
+    })
+    .then(function (answer) {
+      switch (answer.viewMenu) {
+        case "View All Employees":
+          connection.query("select * from employee;", function (err, res) {
+            console.table(res);
+            init();
+          });
+          break;
+        case "View All Roles":
+          connection.query("select * from role;", function (err, res) {
+            console.table(res);
+            init();
+          });
+          break;
+        case "View All Departments":
+          connection.query("select * from department;", function (err, res) {
+            console.table(res);
+            init();
+          });
+          break;
+      }
+    });
+}
+
+function addData() {
+  let querystring =
+    "insert into employee (first_name, last_name, role_id, manager_id) values ('Jonathan', 'Watson', 1, 1);";
+  connection.query(querystring, function (err, res) {
+    viewData();
+  });
+}
+
+function updateData() {
+  let querystring =
+    "update employee set last_name = 'Alan' where first_name = 'Paul';";
+  connection.query(querystring, function (err, res) {
+    viewData();
+  });
 }
