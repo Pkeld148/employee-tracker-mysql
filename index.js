@@ -176,9 +176,15 @@ function addData() {
 }
 
 function updateData() {
-  let querystring =
-    "update employee set last_name = 'Alan' where first_name = 'Paul';";
-  connection.query(querystring, function (err, res) {
-    viewData();
-  });
+    inquirer.prompt({
+        name: "updateEmployeeRole",
+        type: "input",
+        message: "Please select the role you wish to update the employee to: "
+    })
+
+//   let querystring =
+//     "update employee set last_name = 'Alan' where first_name = 'Paul';";
+//   connection.query(querystring, function (err, res) {
+//     viewData();
+//   });
 }
