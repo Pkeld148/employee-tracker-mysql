@@ -66,10 +66,13 @@ function viewData() {
 }
 
 function viewAllEmployees() {
-  connection.query("select * from employee;", function (err, res) {
-    console.table(res);
-    init();
-  });
+  connection.query(
+    "select employee.first_name, employee.last_name, role.title, role.salary from employee inner join role on employee.role_id = role.id;",
+    function (err, res) {
+      console.table(res);
+      init();
+    }
+  );
 }
 
 function viewAllRoles() {
@@ -97,6 +100,9 @@ function addData() {
     .then(function (answer) {
       switch (answer.addMenu) {
         case "Add Employee":
+            connection.query("select * from role;", function (err, results) {
+                if (err) throw err;
+ 
           inquirer
             .prompt([
               {
@@ -111,29 +117,31 @@ function addData() {
               },
               {
                 name: "assignRole",
-                type: "input",
+                type: "list",
                 message: "Please select the employee's ROLE:",
-              },
-              {
-                name: "assignManager",
-                type: "input",
-                message: "Please select the employee's MANAGER:",
-              },
+                choices: function () {
+                    var choiceArray = [];
+                    for (let i = 0; i < results.length; i++) {
+                        choiceArray.push(i+1 + " " + results[i].title);
+                    }
+                    return choiceArray;
+                }
+              }        
             ])
             .then(function (answer) {
-              connection.query(
-                "insert into employee (first_name, last_name, role_id, manager_id) values (?, ?, ?, ?)",
+                var assignRoleID = parseInt(answer.assignRole[0]);
+              connection.query("insert into employee (first_name, last_name, role_id) values (?, ?, ?)",
                 [
                   answer.addEmployeeFirstName,
                   answer.addEmployeeLastName,
-                  answer.assignRole,
-                  answer.assignManager,
+                  assignRoleID
                 ],
                 function (err, res) {
                   viewAllEmployees();
                 }
               );
             });
+        });
           break;
         case "Add Role":
           inquirer
@@ -192,14 +200,14 @@ function updateData() {
           var choiceArray = [];
           for (let i = 0; i < results.length; i++) {
             choiceArray.push(
-              results[i].first_name + " " + results[i].last_name
+              i + 1 + " " + results[i].first_name + " " + results[i].last_name
             );
           }
           return choiceArray;
         },
       })
       .then(function (answer) {
-          var chosenEmployee = answer.updateChooseEmployee;
+        var chosenEmployeeID = parseInt(answer.updateChooseEmployee[0]);
         connection.query("select * from role;", function (err, results) {
           if (err) throw err;
           inquirer
@@ -210,14 +218,25 @@ function updateData() {
               choices: function () {
                 var choiceArray = [];
                 for (let i = 0; i < results.length; i++) {
-                  choiceArray.push(results[i].title);
+                  choiceArray.push(i + 1 + " " + results[i].title);
                 }
                 return choiceArray;
               },
             })
             .then(function (answer) {
-              console.log(chosenEmployee);
-              console.log(answer.updateEmployeeRole);
+              console.log(chosenEmployeeID);
+              var updatedRoleID = parseInt(answer.updateEmployeeRole[0]);
+              connection.query(
+                "update employee set role_id = ? where id = ?;",
+                [updatedRoleID,
+                chosenEmployeeID],
+                function (err) {
+                  if (err) throw err;
+                  console.log("Employee role updated successfully!");
+                  viewAllEmployees();
+                  init();
+                }
+              );
             });
         });
       });
