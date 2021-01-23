@@ -21,7 +21,7 @@ function init() {
     .prompt({
       name: "menu",
       type: "list",
-      message: "Welcome to the main menu!\nWhat would you like to do?",
+      message: "WELCOME TO THE EMPLOYEE MANAGER!\n\nWhat would you like to do?",
       choices: ["[VIEW] Data", "[ADD] Data", "[UPDATE] Data", "EXIT"],
     })
     .then(function (answer) {
@@ -235,7 +235,6 @@ function updateData() {
                   if (err) throw err;
                   console.log("Employee role updated successfully!");
                   viewAllEmployees();
-                  init();
                 }
               );
             });
@@ -243,9 +242,3 @@ function updateData() {
       });
   });
 }
-
-//   let querystring =
-//     "update employee set last_name = 'Alan' where first_name = 'Paul';";
-//   connection.query(querystring, function (err, res) {
-//     viewData();
-//   });
