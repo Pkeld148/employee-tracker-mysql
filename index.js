@@ -97,7 +97,7 @@ function addData() {
     .then(function (answer) {
       switch (answer.addMenu) {
         case "Add Employee":
-            inquirer
+          inquirer
             .prompt([
               {
                 name: "addEmployeeFirstName",
@@ -123,7 +123,12 @@ function addData() {
             .then(function (answer) {
               connection.query(
                 "insert into employee (first_name, last_name, role_id, manager_id) values (?, ?, ?, ?)",
-                [answer.addEmployeeFirstName, answer.addEmployeeLastName, answer.assignRole, answer.assignManager],
+                [
+                  answer.addEmployeeFirstName,
+                  answer.addEmployeeLastName,
+                  answer.assignRole,
+                  answer.assignManager,
+                ],
                 function (err, res) {
                   viewAllEmployees();
                 }
@@ -176,15 +181,51 @@ function addData() {
 }
 
 function updateData() {
-    inquirer.prompt({
-        name: "updateEmployeeRole",
-        type: "input",
-        message: "Please select the role you wish to update the employee to: "
-    })
+  connection.query("select * from employee;", function (err, results) {
+    if (err) throw err;
+    inquirer
+      .prompt({
+        name: "updateChooseEmployee",
+        type: "list",
+        message: "Please select the employee you wish to update: ",
+        choices: function () {
+          var choiceArray = [];
+          for (let i = 0; i < results.length; i++) {
+            choiceArray.push(
+              results[i].first_name + " " + results[i].last_name
+            );
+          }
+          return choiceArray;
+        },
+      })
+      .then(function (answer) {
+          var chosenEmployee = answer.updateChooseEmployee;
+        connection.query("select * from role;", function (err, results) {
+          if (err) throw err;
+          inquirer
+            .prompt({
+              name: "updateEmployeeRole",
+              type: "list",
+              message: "Please select the new role for the chosen employee: ",
+              choices: function () {
+                var choiceArray = [];
+                for (let i = 0; i < results.length; i++) {
+                  choiceArray.push(results[i].title);
+                }
+                return choiceArray;
+              },
+            })
+            .then(function (answer) {
+              console.log(chosenEmployee);
+              console.log(answer.updateEmployeeRole);
+            });
+        });
+      });
+  });
+}
 
 //   let querystring =
 //     "update employee set last_name = 'Alan' where first_name = 'Paul';";
 //   connection.query(querystring, function (err, res) {
 //     viewData();
 //   });
-}
